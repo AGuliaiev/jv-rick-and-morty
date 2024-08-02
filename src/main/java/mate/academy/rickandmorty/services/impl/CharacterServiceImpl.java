@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class CharacterServiceImpl implements CharacterService {
     private final CharacterRepository characterRepository;
+    private final Random random = new Random();
 
     @Override
     public Characters getRandomCharacter() {
@@ -20,7 +21,7 @@ public class CharacterServiceImpl implements CharacterService {
         if (characters.isEmpty()) {
             throw new RuntimeException("No characters in the database");
         }
-        return characters.get(new Random().nextInt(characters.size()));
+        return characters.get(random.nextInt(characters.size()));
     }
 
     @Override

@@ -26,32 +26,34 @@ public class DataLoader {
 
     public void getCharacters() {
         HttpClient client = HttpClient.newHttpClient();
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .GET()
-                .uri(URI.create(BASE_URL))
-                .build();
-
-        try {
-            HttpResponse<String> response = client.send(
-                    request,
-                    HttpResponse.BodyHandlers.ofString()
-            );
-            CharacterResponseDto characterDto = objectMapper.readValue(
-                    response.body(),
-                    CharacterResponseDto.class
-            );
-            List<CharacterDto> list = characterDto.results().stream().toList();
-            Set<Long> existingIds = new HashSet<>(characterService.getAllCharacterIds());
-            List<Characters> newCharacters = list.stream()
-                    .filter(dto -> !existingIds.contains(dto.id()))
-                    .map(characterMapper::toModel)
-                    .toList();
-            if (!newCharacters.isEmpty()) {
-                characterService.saveAllCharacters(newCharacters);
+        String url = BASE_URL;
+        Set<Long> existingIds = new HashSet<>(characterService.getAllCharacterIds());
+        while (url != null) {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .GET()
+                    .uri(URI.create(url))
+                    .build();
+            try {
+                HttpResponse<String> response = client.send(
+                        request,
+                        HttpResponse.BodyHandlers.ofString()
+                );
+                CharacterResponseDto characterDto = objectMapper.readValue(
+                        response.body(),
+                        CharacterResponseDto.class
+                );
+                List<CharacterDto> characterDtoList = characterDto.results().stream().toList();
+                List<Characters> newCharacters = characterDtoList.stream()
+                        .filter(dto -> !existingIds.contains(dto.id()))
+                        .map(characterMapper::toModel)
+                        .toList();
+                if (!newCharacters.isEmpty()) {
+                    characterService.saveAllCharacters(newCharacters);
+                }
+                url = characterDto.info().next();
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
             }
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
         }
     }
 }

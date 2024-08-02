@@ -6,7 +6,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import mate.academy.rickandmorty.models.Characters;
 import mate.academy.rickandmorty.services.CharacterService;
-import mate.academy.rickandmorty.services.DataLoader;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class CharacterController {
 
     private final CharacterService characterService;
-    private final DataLoader dataLoader;
 
     @GetMapping("/random")
     @Operation(
@@ -33,7 +31,7 @@ public class CharacterController {
         return characterService.getRandomCharacter();
     }
 
-    @GetMapping("/search")
+    @GetMapping
     @Operation(
             summary = "Search characters by name",
             description = "Search characters by name from Rick and Morty"
