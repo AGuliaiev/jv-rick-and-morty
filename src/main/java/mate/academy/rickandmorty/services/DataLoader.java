@@ -14,19 +14,21 @@ import mate.academy.rickandmorty.dto.external.CharacterDto;
 import mate.academy.rickandmorty.dto.external.CharacterResponseDto;
 import mate.academy.rickandmorty.mapper.CharacterMapper;
 import mate.academy.rickandmorty.models.Characters;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class DataLoader {
-    private static final String BASE_URL = "https://rickandmortyapi.com/api/character";
+    @Value("${rick-and-morty.url}")
+    private String baseUrl;
     private final CharacterService characterService;
     private final ObjectMapper objectMapper;
     private final CharacterMapper characterMapper;
 
     public void getCharacters() {
         HttpClient client = HttpClient.newHttpClient();
-        String url = BASE_URL;
+        String url = baseUrl;
         Set<Long> existingIds = new HashSet<>(characterService.getAllCharacterIds());
         while (url != null) {
             HttpRequest request = HttpRequest.newBuilder()
